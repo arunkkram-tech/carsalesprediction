@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 
 # Function to calculate RSI
 def calculate_rsi(data, window=14):
@@ -21,7 +22,8 @@ def calculate_rsi(data, window=14):
 
 # Function to predict next day's price range
 def predict_next_day_range(data):
-    data['Date'] = np.arange(len(data))  # Add numeric dates for linear regression
+    
+    """ data['Date'] = np.arange(len(data))  # Add numeric dates for linear regression
     X = data[['Date']]
     y_high = data['High']
     y_low = data['Low']
@@ -32,7 +34,25 @@ def predict_next_day_range(data):
 
     next_day = [[len(data)]]  # Numeric value for the next day
     predicted_high = model_high.predict(next_day)[0]
+    predicted_low = model_low.predict(next_day)[0] """
+
+    data = data.dropna()
+    data['Date'] = np.arange(len(data))  # Add numeric dates for training
+    X = data[['Date']]
+    y_high = data['High']
+    y_low = data['Low']
+
+    # Train Random Forest Regressor for High and Low prices
+    model_high = RandomForestRegressor(n_estimators=100, random_state=42)
+    model_low = RandomForestRegressor(n_estimators=100, random_state=42)
+    model_high.fit(X, y_high)
+    model_low.fit(X, y_low)
+
+    next_day = [[len(data)]]  # Numeric value for the next day
+    predicted_high = model_high.predict(next_day)[0]
     predicted_low = model_low.predict(next_day)[0]
+
+
 
     return predicted_low, predicted_high
 
@@ -128,11 +148,15 @@ if st.sidebar.button("Fetch Data"):
             st.plotly_chart(fig_rsi)
 
             # Next Day Price Range Prediction
+            #st.subheader("Next Day Price Range Prediction")
+            #predicted_low, predicted_high = predict_next_day_range(stock_data)
+            #st.write(f"Predicted Low: {predicted_low:.2f}")
+            #st.write(f"Predicted High: {predicted_high:.2f}")
+
             st.subheader("Next Day Price Range Prediction")
             predicted_low, predicted_high = predict_next_day_range(stock_data)
-            st.write(f"Predicted Low: {predicted_low:.2f}")
-            st.write(f"Predicted High: {predicted_high:.2f}")
-
+            st.write(f"Predicted Low: {float(predicted_low):.2f}")
+            st.write(f"Predicted High: {float(predicted_high):.2f}")
         else:
             st.error("No data found. Please check the ticker symbol and date range.")
     else:
