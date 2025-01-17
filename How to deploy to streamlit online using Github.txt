@@ -1,0 +1,13 @@
+# Create a repository in github
+
+# Upload the code , that contains the model , created using chat GPT to Github
+
+# Specify the modules to be imported in requirements.txt file in git hub
+
+# Commit the changes
+
+# Later Sign-up to Streamlit using Github account
+
+# Use create app option ( top right corner ) to create an app. Select the repository and python file and click DEPLOY
+
+# Stream lit will run the model online if the python code is error free.
